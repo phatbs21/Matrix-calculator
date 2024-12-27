@@ -1,6 +1,5 @@
 # Matrix Calculator
 
-![License](https://img.shields.io/github/license/yourusername/matrix-calculator)
 ![Python Version](https://img.shields.io/badge/Python-3.8%2B-blue.svg)
 ![Streamlit Version](https://img.shields.io/badge/Streamlit-1.0.0%2B-blue.svg)
 
@@ -85,12 +84,6 @@ To get started with the Matrix Calculator, follow these steps:
 4. **Install Dependencies**:
 
     ```bash
-    pip install -r requirements.txt
-    ```
-
-    *If a `requirements.txt` file is not provided, install the necessary packages manually:*
-
-    ```bash
     pip install streamlit numpy pandas sympy
     ```
 
@@ -99,4 +92,4 @@ To get started with the Matrix Calculator, follow these steps:
 Once the installation is complete, you can run the Matrix Calculator using Streamlit:
 
 ```bash
-streamlit run app.py
+streamlit run Application.py
