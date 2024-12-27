@@ -2,17 +2,17 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-# ===============================
-# 1. SET PAGE CONFIG FIRST
-# ===============================
+# -----------------------------
+# 1) PAGE CONFIG
+# -----------------------------
 st.set_page_config(
-    page_title="Matrix Operations – Immediate Update Fix",
+    page_title="Matrix Operations – Submit Edits Button",
     layout="wide"
 )
 
-# ===============================
-# 2. GLOBAL CSS (Optional)
-# ===============================
+# -----------------------------
+# 2) GLOBAL CSS (Optional)
+# -----------------------------
 CUSTOM_CSS = """
 <style>
 body, .stApp {
@@ -25,11 +25,10 @@ body, .stApp {
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-# ===============================
-# 3. MATRIX OPERATIONS
-# ===============================
 
-
+# -----------------------------
+# 3) MATRIX OPERATIONS
+# -----------------------------
 def add_matrices(matrix1, matrix2):
     try:
         a = np.array(matrix1, dtype=float)
@@ -124,120 +123,89 @@ def gauss_jordan_elimination(matrix):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# ===============================
-# 4. HELPERS TO ADD/DELETE ROWS/COLS
-#    We call st.experimental_rerun() to refresh instantly.
-# ===============================
 
-
-def add_row(matrix_key):
-    df = st.session_state[matrix_key]
-    new_row = pd.DataFrame([[0.0]*df.shape[1]], columns=df.columns)
-    st.session_state[matrix_key] = pd.concat([df, new_row], ignore_index=True)
-    # Also update list-of-lists version
-    _update_list_matrix(matrix_key)
-    st.experimental_rerun()
-
-
-def add_col(matrix_key):
-    df = st.session_state[matrix_key]
-    new_col_name = f"col{df.shape[1]}"  # or any naming scheme
-    df[new_col_name] = 0.0
-    st.session_state[matrix_key] = df
-    _update_list_matrix(matrix_key)
-    st.experimental_rerun()
-
-
-def remove_row(matrix_key):
-    df = st.session_state[matrix_key]
-    if df.shape[0] > 1:
-        df = df.iloc[:-1]
-        st.session_state[matrix_key] = df
-        _update_list_matrix(matrix_key)
-    st.experimental_rerun()
-
-
-def remove_col(matrix_key):
-    df = st.session_state[matrix_key]
-    if df.shape[1] > 1:
-        df = df.iloc[:, :-1]
-        st.session_state[matrix_key] = df
-        _update_list_matrix(matrix_key)
-    st.experimental_rerun()
-
-
-def _update_list_matrix(matrix_key):
-    """
-    Convert the current DataFrame in session_state[matrix_key]
-    to a list-of-lists and store it in session_state[matrix_key+'_list'].
-    """
-    df = st.session_state[matrix_key]
-    st.session_state[matrix_key + "_list"] = df.to_numpy().tolist()
-
-# ===============================
-# 5. INITIALIZE SESSION STATE
-#    We keep both a DataFrame (for st.data_editor) and a list-of-lists.
-# ===============================
-
-
-def init_session_state_matrix(df_key, list_key, initial_data):
-    """
-    If the DataFrame key or the list-of-lists key doesn't exist yet,
-    create them from the given initial_data.
-    """
+# -----------------------------
+# 4) INITIALIZE SESSION STATE
+# -----------------------------
+def init_df_state(df_key, list_key, data):
     if df_key not in st.session_state:
-        st.session_state[df_key] = pd.DataFrame(initial_data)
+        st.session_state[df_key] = pd.DataFrame(data)
     if list_key not in st.session_state:
-        st.session_state[list_key] = initial_data
+        st.session_state[list_key] = data
 
+
+init_df_state("matrix1_df", "matrix1_list", [[1, 2], [3, 4]])
+init_df_state("matrix2_df", "matrix2_list", [[5, 6], [7, 8]])
+init_df_state("constants_df", "constants_list", [[1], [1]])
 
 if "result" not in st.session_state:
     st.session_state["result"] = []
 if "scalar_result" not in st.session_state:
     st.session_state["scalar_result"] = ""
 
-# Matrix 1
-init_session_state_matrix(
-    df_key="matrix1",
-    list_key="matrix1_list",
-    initial_data=[[1, 2], [3, 4]]
-)
-# Matrix 2
-init_session_state_matrix(
-    df_key="matrix2",
-    list_key="matrix2_list",
-    initial_data=[[5, 6], [7, 8]]
-)
-# Constants
-init_session_state_matrix(
-    df_key="constants",
-    list_key="constants_list",
-    initial_data=[[1], [1]]
-)
 
-# ===============================
-# 6. COLUMN CONFIG FOR DECIMALS (optional)
-# ===============================
+# -----------------------------
+# 5) ADD/DEL ROW/COL HELPER
+#    (forces immediate rerun)
+# -----------------------------
+def _update_list_matrix(df_key, list_key):
+    st.session_state[list_key] = st.session_state[df_key].to_numpy().tolist()
 
 
-def get_decimal_config(df):
+def add_row(df_key, list_key):
+    df = st.session_state[df_key]
+    new_row = pd.DataFrame([[0.0]*df.shape[1]], columns=df.columns)
+    st.session_state[df_key] = pd.concat([df, new_row], ignore_index=True)
+    _update_list_matrix(df_key, list_key)
+    st.experimental_rerun()
+
+
+def add_col(df_key, list_key):
+    df = st.session_state[df_key]
+    new_col_name = f"C{df.shape[1]}"
+    df[new_col_name] = 0.0
+    st.session_state[df_key] = df
+    _update_list_matrix(df_key, list_key)
+    st.experimental_rerun()
+
+
+def remove_row(df_key, list_key):
+    df = st.session_state[df_key]
+    if df.shape[0] > 1:
+        st.session_state[df_key] = df.iloc[:-1, :]
+        _update_list_matrix(df_key, list_key)
+    st.experimental_rerun()
+
+
+def remove_col(df_key, list_key):
+    df = st.session_state[df_key]
+    if df.shape[1] > 1:
+        st.session_state[df_key] = df.iloc[:, :-1]
+        _update_list_matrix(df_key, list_key)
+    st.experimental_rerun()
+
+
+# -----------------------------
+# 6) OPTIONAL: COLUMN CONFIG FOR DECIMALS
+# -----------------------------
+def get_decimal_config(df: pd.DataFrame):
     col_config = {}
-    for col in df.columns:
-        col_config[col] = st.column_config.NumberColumn(
-            label=str(col),
+    for c in df.columns:
+        col_config[c] = st.column_config.NumberColumn(
+            label=str(c),
             step=0.01,
             format="%.4f",
         )
     return col_config
 
-# ===============================
-# 7. MAIN APP
-# ===============================
 
-
+# -----------------------------
+# 7) MAIN APP
+# -----------------------------
 def main():
-    st.title("Immediate Update Fix: Matrix Operations")
+    st.title("Streamlit Data Editor – Submit Edits Fix")
 
+    # ~~~~~~~~~~~ Sidebar Menu ~~~~~~~~~~~
     st.sidebar.title("Menu")
     operations = [
         "Addition",
@@ -254,119 +222,113 @@ def main():
     ]
     operation = st.sidebar.radio("Select an Operation:", operations)
 
-    col1, col2, col3 = st.columns([1.1, 1.1, 1])
+    # 7.1 Layout for the 3 data editors
+    c1, c2, c3 = st.columns([1.1, 1.1, 1])
 
-    # --------------------------------
-    # Matrix 1
-    # --------------------------------
-    with col1:
+    # ----------- Matrix 1 -----------
+    with c1:
         st.subheader("Matrix 1")
+        df_m1 = st.session_state["matrix1_df"]
 
-        df_m1 = st.session_state["matrix1"]
+        # Show data editor
         config_m1 = get_decimal_config(df_m1)
-
-        edited_df_m1 = st.data_editor(
+        edited_m1 = st.data_editor(
             df_m1,
+            key="m1_editor",
             column_config=config_m1,
-            key="matrix1_editor",
-            use_container_width=True
+            use_container_width=True,
         )
-        # Update the DF in session_state if user changed anything
-        if not edited_df_m1.equals(df_m1):
-            st.session_state["matrix1"] = edited_df_m1
-            _update_list_matrix("matrix1")
+        # Show a "Submit Edits" button that re-runs, storing changes
+        if st.button("Submit Edits (M1)"):
+            st.session_state["matrix1_df"] = edited_m1
+            _update_list_matrix("matrix1_df", "matrix1_list")
+            st.experimental_rerun()
 
-        # Buttons
+        # Row/Col Buttons
         b1_1, b1_2, b1_3, b1_4 = st.columns(4)
         with b1_1:
             if st.button("➕Row (M1)"):
-                add_row("matrix1")
+                add_row("matrix1_df", "matrix1_list")
         with b1_2:
             if st.button("➕Col (M1)"):
-                add_col("matrix1")
+                add_col("matrix1_df", "matrix1_list")
         with b1_3:
             if st.button("➖Row (M1)"):
-                remove_row("matrix1")
+                remove_row("matrix1_df", "matrix1_list")
         with b1_4:
             if st.button("➖Col (M1)"):
-                remove_col("matrix1")
+                remove_col("matrix1_df", "matrix1_list")
 
-    # --------------------------------
-    # Matrix 2
-    # --------------------------------
-    with col2:
+    # ----------- Matrix 2 -----------
+    with c2:
         st.subheader("Matrix 2")
         if operation in ["Addition", "Multiplication"]:
-            df_m2 = st.session_state["matrix2"]
+            df_m2 = st.session_state["matrix2_df"]
             config_m2 = get_decimal_config(df_m2)
-
-            edited_df_m2 = st.data_editor(
+            edited_m2 = st.data_editor(
                 df_m2,
+                key="m2_editor",
                 column_config=config_m2,
-                key="matrix2_editor",
                 use_container_width=True
             )
-            # Update session_state if changed
-            if not edited_df_m2.equals(df_m2):
-                st.session_state["matrix2"] = edited_df_m2
-                _update_list_matrix("matrix2")
+            if st.button("Submit Edits (M2)"):
+                st.session_state["matrix2_df"] = edited_m2
+                _update_list_matrix("matrix2_df", "matrix2_list")
+                st.experimental_rerun()
 
-            d1, d2, d3, d4 = st.columns(4)
-            with d1:
+            d2_1, d2_2, d2_3, d2_4 = st.columns(4)
+            with d2_1:
                 if st.button("➕Row (M2)"):
-                    add_row("matrix2")
-            with d2:
+                    add_row("matrix2_df", "matrix2_list")
+            with d2_2:
                 if st.button("➕Col (M2)"):
-                    add_col("matrix2")
-            with d3:
+                    add_col("matrix2_df", "matrix2_list")
+            with d2_3:
                 if st.button("➖Row (M2)"):
-                    remove_row("matrix2")
-            with d4:
+                    remove_row("matrix2_df", "matrix2_list")
+            with d2_4:
                 if st.button("➖Col (M2)"):
-                    remove_col("matrix2")
+                    remove_col("matrix2_df", "matrix2_list")
+
         else:
             st.info("Matrix 2 not needed for this operation.")
 
-    # --------------------------------
-    # Constants
-    # --------------------------------
-    with col3:
+    # ----------- Constants -----------
+    with c3:
         st.subheader("Constants")
         if operation == "Solve Linear System":
-            df_const = st.session_state["constants"]
+            df_const = st.session_state["constants_df"]
             config_const = get_decimal_config(df_const)
-
-            edited_df_const = st.data_editor(
+            edited_const = st.data_editor(
                 df_const,
+                key="const_editor",
                 column_config=config_const,
-                key="constants_editor",
                 use_container_width=True
             )
-            if not edited_df_const.equals(df_const):
-                st.session_state["constants"] = edited_df_const
-                _update_list_matrix("constants")
+            if st.button("Submit Edits (Const)"):
+                st.session_state["constants_df"] = edited_const
+                _update_list_matrix("constants_df", "constants_list")
+                st.experimental_rerun()
 
             e1, e2, e3, e4 = st.columns(4)
             with e1:
                 if st.button("➕Row (Const)"):
-                    add_row("constants")
+                    add_row("constants_df", "constants_list")
             with e2:
                 if st.button("➕Col (Const)"):
-                    add_col("constants")
+                    add_col("constants_df", "constants_list")
             with e3:
                 if st.button("➖Row (Const)"):
-                    remove_row("constants")
+                    remove_row("constants_df", "constants_list")
             with e4:
                 if st.button("➖Col (Const)"):
-                    remove_col("constants")
+                    remove_col("constants_df", "constants_list")
         else:
             st.info("Constants not needed for this operation.")
 
     st.divider()
 
-    # --------------------------------
-    # Compute the selected operation
-    # --------------------------------
+    # 7.2: Compute Operation
     if st.button("Compute"):
         mat1 = st.session_state["matrix1_list"]
         mat2 = st.session_state["matrix2_list"]
@@ -408,28 +370,22 @@ def main():
             st.session_state["result"] = gauss_jordan_elimination(mat1)
             st.session_state["scalar_result"] = ""
 
-    # --------------------------------
-    # Display Results
-    # --------------------------------
+    # 7.3: Display Results
     st.subheader("Results")
     if isinstance(st.session_state["result"], list) and len(st.session_state["result"]) > 0:
-        df_result = pd.DataFrame(st.session_state["result"])
-        df_styled = df_result.style.set_properties(
+        df_res = pd.DataFrame(st.session_state["result"])
+        df_styled = df_res.style.set_properties(
             **{'font-size': '18px', 'color': 'black', 'font-family': 'Poppins, sans-serif'}
         )
         st.dataframe(df_styled, use_container_width=True)
 
     if st.session_state["scalar_result"] != "":
-        if isinstance(st.session_state["scalar_result"], list):
-            scalar_str = str(st.session_state["scalar_result"])
-        else:
-            scalar_str = str(st.session_state["scalar_result"])
+        text = st.session_state["scalar_result"]
+        if isinstance(text, list):
+            text = str(text)
         st.markdown(
-            f"""
-            <div style="color: black; font-size: 18px; font-family: 'Poppins', sans-serif;">
-            {scalar_str}
-            </div>
-            """,
+            f"<div style='font-size:18px; color:black; font-family:Poppins,sans-serif;'>{
+                text}</div>",
             unsafe_allow_html=True
         )
 
