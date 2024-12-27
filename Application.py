@@ -6,7 +6,7 @@ import pandas as pd
 # 1) PAGE CONFIG
 # -----------------------------
 st.set_page_config(
-    page_title="Matrix Operations – Submit Edits Button",
+    page_title="Matrix calculation",
     layout="wide"
 )
 
@@ -203,7 +203,7 @@ def get_decimal_config(df: pd.DataFrame):
 # 7) MAIN APP
 # -----------------------------
 def main():
-    st.title("Streamlit Data Editor – Submit Edits Fix")
+    st.title("Matrix calculation")
 
     # ~~~~~~~~~~~ Sidebar Menu ~~~~~~~~~~~
     st.sidebar.title("Menu")
