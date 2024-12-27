@@ -384,8 +384,11 @@ def main():
         if isinstance(text, list):
             text = str(text)
         st.markdown(
-            f"<div style='font-size:18px; color:black; font-family:Poppins,sans-serif;'>{
-                text}</div>",
+            f"""
+            <div style='font-size:18px; color:black; font-family:Poppins,sans-serif;'>
+            {text}
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
