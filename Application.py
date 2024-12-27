@@ -157,7 +157,7 @@ def add_row(df_key, list_key):
     new_row = pd.DataFrame([[0.0]*df.shape[1]], columns=df.columns)
     st.session_state[df_key] = pd.concat([df, new_row], ignore_index=True)
     _update_list_matrix(df_key, list_key)
-    st.experimental_rerun()
+    st.rerun()
 
 
 def add_col(df_key, list_key):
@@ -166,7 +166,7 @@ def add_col(df_key, list_key):
     df[new_col_name] = 0.0
     st.session_state[df_key] = df
     _update_list_matrix(df_key, list_key)
-    st.experimental_rerun()
+    st.rerun()
 
 
 def remove_row(df_key, list_key):
@@ -174,7 +174,7 @@ def remove_row(df_key, list_key):
     if df.shape[0] > 1:
         st.session_state[df_key] = df.iloc[:-1, :]
         _update_list_matrix(df_key, list_key)
-    st.experimental_rerun()
+    st.rerun()
 
 
 def remove_col(df_key, list_key):
@@ -182,7 +182,7 @@ def remove_col(df_key, list_key):
     if df.shape[1] > 1:
         st.session_state[df_key] = df.iloc[:, :-1]
         _update_list_matrix(df_key, list_key)
-    st.experimental_rerun()
+    st.rerun()
 
 
 # -----------------------------
@@ -242,7 +242,7 @@ def main():
         if st.button("Submit Edits (M1)"):
             st.session_state["matrix1_df"] = edited_m1
             _update_list_matrix("matrix1_df", "matrix1_list")
-            st.experimental_rerun()
+            st.rerun()
 
         # Row/Col Buttons
         b1_1, b1_2, b1_3, b1_4 = st.columns(4)
@@ -274,7 +274,7 @@ def main():
             if st.button("Submit Edits (M2)"):
                 st.session_state["matrix2_df"] = edited_m2
                 _update_list_matrix("matrix2_df", "matrix2_list")
-                st.experimental_rerun()
+                st.rerun()
 
             d2_1, d2_2, d2_3, d2_4 = st.columns(4)
             with d2_1:
@@ -308,7 +308,7 @@ def main():
             if st.button("Submit Edits (Const)"):
                 st.session_state["constants_df"] = edited_const
                 _update_list_matrix("constants_df", "constants_list")
-                st.experimental_rerun()
+                st.rerun()
 
             e1, e2, e3, e4 = st.columns(4)
             with e1:
