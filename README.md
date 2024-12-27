@@ -6,10 +6,8 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
-- [Demo](#demo)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [License](#license)
 - [Authors](#authors)
@@ -57,7 +55,7 @@ To get started with the Matrix Calculator, follow these steps:
 1. **Clone the Repository** (or download the source code):
 
     ```bash
-    git clone https://github.com/yourusername/matrix-calculator.git
+    https://github.com/phatbs21/Matrix-calculator.git
     cd matrix-calculator
     ```
 
